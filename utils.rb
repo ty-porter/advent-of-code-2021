@@ -19,3 +19,7 @@ def str_groups_from_prompt
     group.reject { |str| str == "" }
   end
 end
+
+def str_single_from_prompt(index = 0)
+  strs_from_prompt[index]
+end
