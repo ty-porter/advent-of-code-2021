@@ -37,11 +37,11 @@ def part_2_solution(strs)
   outputs = strs.map do |str| 
     signals, targets = str.split(" | ").map(&:split)
 
-    bleft_signal = signals.detect { |signal| signal.size == 6 && (signal.chars + FOUR(signals)).uniq.sort != EIGHT(signals).sort }
-    bleft = (EIGHT(signals) - bleft_signal.chars).first
+    nine_segments = signals.detect { |signal| signal.size == 6 && (signal.chars + FOUR(signals)).uniq.sort != EIGHT(signals).sort }
+    bleft = (EIGHT(signals) - nine_segments\.chars).first
 
-    tright_signal = signals.detect { |signal| signal.size == 6 && (signal.chars + ONE(signals)).uniq.sort == EIGHT(signals).sort }
-    tright = (EIGHT(signals) - tright_signal.chars).first
+    six_segments = signals.detect { |signal| signal.size == 6 && (signal.chars + ONE(signals)).uniq.sort == EIGHT(signals).sort }
+    tright = (EIGHT(signals) - six_segments.chars).first
 
     targets.map do |segment|
       next 1 if segment.size == 2
