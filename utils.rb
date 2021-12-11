@@ -8,6 +8,10 @@ def nums_from_prompt
   prompt_data.readlines.map { |num| num.chomp.to_i }
 end
 
+def num_groups_from_prompt
+  prompt_data.readlines.map { |str| str.chars.map(&:to_i) }
+end
+
 def strs_from_prompt
   prompt_data.readlines.map(&:chomp)
 end
