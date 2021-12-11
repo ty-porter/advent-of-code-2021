@@ -106,10 +106,7 @@ def part_1_solution(grid, iterations: 100)
       end
     end
 
-    if grid.flatten.all?(&:flashed)
-      print grid
-      return i + 1
-    end 
+    return i + 1 if grid.flatten.all?(&:flashed)
 
     reset_flash_timers(grid)
   end
