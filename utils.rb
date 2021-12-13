@@ -27,3 +27,22 @@ end
 def str_single_from_prompt(index = 0)
   strs_from_prompt[index]
 end
+
+class Array
+  # Prints a 2D array representation
+  def p2d(delimiter = ",")
+    max_size = flatten.map do |cell|
+      if cell.is_a?(Integer)
+        cell.digits.size
+      elsif cell.is_a?(String)
+        cell.size
+      end
+    end.max
+
+    string = map do |row|
+      row.map { |cell| cell.to_s.rjust(max_size) }.join(delimiter)
+    end.join("\n") + "\n"
+
+    puts string
+  end
+end
