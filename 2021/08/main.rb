@@ -38,7 +38,7 @@ def part_2_solution(strs)
     signals, targets = str.split(" | ").map(&:split)
 
     nine_segments = signals.detect { |signal| signal.size == 6 && (signal.chars + FOUR(signals)).uniq.sort != EIGHT(signals).sort }
-    bleft = (EIGHT(signals) - nine_segments\.chars).first
+    bleft = (EIGHT(signals) - nine_segments.chars).first
 
     six_segments = signals.detect { |signal| signal.size == 6 && (signal.chars + ONE(signals)).uniq.sort == EIGHT(signals).sort }
     tright = (EIGHT(signals) - six_segments.chars).first

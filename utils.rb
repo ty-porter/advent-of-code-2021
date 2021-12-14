@@ -46,3 +46,16 @@ class Array
     puts string
   end
 end
+
+class Color
+  RED     = 31
+  GREEN   = 32
+  YELLOW  = 33
+  BLUE    = 34
+  MAGENTA = 35
+  CYAN    = 36
+end
+
+def colorize(text, color_code)
+  "\e[#{color_code}m#{text}\e[0m"
+end

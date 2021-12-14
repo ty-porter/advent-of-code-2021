@@ -18,7 +18,6 @@ end
 def part_2_solution(strs)
   pos = [0, 0, 0]
 
-  puts strs.inspect
   strs.each do |str|
     command, amount = str.split(" ")
 

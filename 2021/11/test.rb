@@ -24,11 +24,6 @@ large_test_grid_template = %w[
 small_test_grid = generate_octopi_grid(small_test_grid_template)
 large_test_grid = generate_octopi_grid(large_test_grid_template)
 
-class Color
-  RED   = 31
-  GREEN = 32
-end
-
 def solutions(path)
   File.open(path).readlines.map(&:chomp).chunk_while do |cur, prv|
     cur != ""
@@ -43,10 +38,6 @@ def generate_grid_from_file(path)
       row.chars.map(&:to_i)
     end
   end
-end
-
-def colorize(text, color_code)
-  "\e[#{color_code}m#{text}\e[0m"
 end
 
 single_step_solutions = generate_grid_from_file "steps_single.txt"
