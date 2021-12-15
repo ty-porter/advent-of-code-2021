@@ -1,5 +1,7 @@
 require_relative "../../utils.rb"
 
+require 'pqueue'
+
 class Array
   def neighbors(x, y)
     [
@@ -28,11 +30,10 @@ def part_1_solution(strs, printable: true)
 
   visited = []
   initial = [start, 0]
-  queue   = [initial]
+  queue   = PQueue.new([initial]) { |a, b| a.last < b.last }
 
-  i = 0
   lowest_risk = while !queue.empty?
-    position, risk = queue.shift
+    position, risk = queue.pop
 
     next if visited.include?(position)
 
@@ -41,10 +42,8 @@ def part_1_solution(strs, printable: true)
     break risk if position == target
 
     grid.neighbors(*position).each do |x, y|
-      queue << [[x, y], risk + grid.at(x, y)]
+      queue.push([[x, y], risk + grid.at(x, y)])
     end
-
-    queue.sort_by!(&:last)
   end
 
   puts "PART 1: #{lowest_risk}" if printable
@@ -65,7 +64,7 @@ def part_2_solution(tile)
     end
   end.flatten(1)
 
-  risk = part_1_solution(tile, printable: false)
+  risk = part_1_solution(tiled_grid, printable: false)
 
   puts "PART 2: #{risk}"
 end
@@ -136,5 +135,5 @@ tiled_test_strs = %w[
   67554889357866599146897761125791887223681299833479
 ]
 
-part_1_solution strs_from_prompt
+# part_1_solution strs_from_prompt
 part_2_solution strs_from_prompt
