@@ -30,8 +30,8 @@ end
 
 class Array
   # Prints a 2D array representation
-  def p2d(delimiter = ",")
-    max_size = flatten.map do |cell|
+  def p2d(delimiter: ",", max_size: nil)
+    size = max_size || flatten.map do |cell|
       if cell.is_a?(Integer)
         cell.digits.size
       elsif cell.is_a?(String)
@@ -40,7 +40,7 @@ class Array
     end.max
 
     string = map do |row|
-      row.map { |cell| cell.to_s.rjust(max_size) }.join(delimiter)
+      row.map { |cell| cell.to_s.rjust(size) }.join(delimiter)
     end.join("\n") + "\n"
 
     puts string

@@ -53,7 +53,7 @@ def part_1_solution(values, limit: 1)
 
   if limit.nil?
     puts "PART 2:"
-    grid.p2d("")
+    grid.p2d(delimiter: "")
   else
     puts "PART 1: #{value}"
   end
