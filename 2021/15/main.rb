@@ -1,6 +1,7 @@
 require_relative "../../utils.rb"
 
 require 'pqueue'
+require 'set'
 
 class Array
   def neighbors(x, y)
@@ -20,35 +21,36 @@ class Array
   end
 end
 
-def part_1_solution(strs, printable: true)
-  grid = strs.map do |str|
-    str.chars.map(&:to_i)
-  end
-
+def find_path(grid)
   start  = [0, 0]
   target = [grid.first.size - 1, grid.size - 1]
 
-  visited = []
+  visited = Set[]
   initial = [start, 0]
   queue   = PQueue.new([initial]) { |a, b| a.last < b.last }
 
-  lowest_risk = while !queue.empty?
+  until queue.empty?
     position, risk = queue.pop
 
-    next if visited.include?(position)
-
-    visited << position
-
-    break risk if position == target
+    next unless visited.add?(position)
+    return risk if position == target
 
     grid.neighbors(*position).each do |x, y|
       queue.push([[x, y], risk + grid.at(x, y)])
     end
   end
+end
 
-  puts "PART 1: #{lowest_risk}" if printable
+def part_1_solution(strs, printable: true)
+  grid = strs.map do |str|
+    str.chars.map(&:to_i)
+  end
 
-  lowest_risk
+  risk = find_path(grid)
+
+  puts "PART 1: #{risk}" if printable
+
+  risk
 end
 
 def part_2_solution(tile)
@@ -135,5 +137,5 @@ tiled_test_strs = %w[
   67554889357866599146897761125791887223681299833479
 ]
 
-# part_1_solution strs_from_prompt
+part_1_solution strs_from_prompt
 part_2_solution strs_from_prompt
