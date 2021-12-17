@@ -54,7 +54,7 @@ def part_1_solution(strs, printable: true)
 end
 
 def part_2_solution(tile)
- tiled_grid = (0...5).map do |y|
+  tiled_grid = (0...5).map do |y|
     tile.map do |tile_row|
       (0...5).map do |x| 
         tile_row.chars.map do |cell|
