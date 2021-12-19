@@ -28,6 +28,10 @@ def str_single_from_prompt(index = 0)
   strs_from_prompt[index]
 end
 
+def arys_from_prompt
+  prompt_data.readlines.map { |str| eval(str.chomp) }
+end
+
 class Array
   # Prints a 2D array representation
   def p2d(delimiter: ",", max_size: nil)
@@ -58,4 +62,9 @@ end
 
 def colorize(text, color_code)
   "\e[#{color_code}m#{text}\e[0m"
+end
+
+def test(label, actual, expected)
+  puts "TEST: #{label}"
+  puts colorize("Expected #{expected}, got #{actual}.", actual == expected ? Color::GREEN : Color::RED)
 end

@@ -1,11 +1,6 @@
 require_relative "../../utils.rb"
 require_relative "solution.rb"
 
-def test(signal, actual, expected)
-  puts signal
-  puts colorize("Expected #{expected}, got #{actual}.", actual == expected ? Color::GREEN : Color::RED)
-end
-
 pt1_test_signals = [
   ["D2FE28", 6],
   ["38006F45291200", 9],
