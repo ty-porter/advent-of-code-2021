@@ -34,7 +34,6 @@ def reduce(fish, iter_limit = nil, iterations = 0)
 end
 
 def explode(fish, i)
-  start_i = i
   match = while i < fish.size
     subset = fish[i, 7]
     match = subset.match(/\[\d+,\d+\]/)
@@ -57,9 +56,7 @@ end
 def split(fish, i)
   value = fish[i, 2].to_i
 
-  new_fish = fish[0, i] + "[#{value / 2},#{(value / 2.0).ceil}]" + fish[i + 2..-1]
-
-  new_fish
+  fish[0, i] + "[#{value / 2},#{(value / 2.0).ceil}]" + fish[i + 2..-1]
 end
 
 def generate_exploded_substrings(l_value, r_value, left, right)
