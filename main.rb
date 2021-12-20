@@ -1,23 +1,16 @@
 require_relative "utils.rb"
 
-dirs = ARGV.any? ? ARGV : Dir.glob('*').select {|f| File.directory? f }
+puts colorize("Printing Advent of Code solutions for 2021!", Color::YELLOW)
 
-puts colorize("Printing Advent of Code solutions for Year(s) #{dirs.join(', ')}!", Color::YELLOW)
+Dir.glob("solutions/*").select {|f| File.directory? f }.each_with_index do |solution, index|
+  Dir.chdir(solution) do
+    indent = " " * 2
+    
+    puts if index > 0
+    puts indent + colorize("- DAY #{solution.split("/").last.to_i}", Color::CYAN)
 
-dirs.each do |year|
-  puts
-  puts colorize("YEAR #{year}", Color::GREEN)
+    results = `ruby main.rb`
 
-  Dir.glob("#{year}/*").select {|f| File.directory? f }.each_with_index do |solution, index|
-    Dir.chdir(solution) do
-      indent = " " * 2
-      
-      puts if index > 0
-      puts indent + colorize("- DAY #{solution.split("/").last}", Color::CYAN)
-
-      results = `ruby main.rb`
-
-      puts results.split("\n").map { |line| colorize(indent * 3 + line, Color::YELLOW) }
-    end
+    puts results.split("\n").map { |line| colorize(indent * 3 + line, Color::YELLOW) }
   end
 end
