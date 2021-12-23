@@ -1,10 +1,43 @@
 require_relative "../../utils.rb"
 
+class Array
+  def tally
+    group_by { |v| v }.map { |k, v| [k, v.size] }.to_h
+  end
+end
+
 class Scanner
+  ROTATIONS = [
+    -> (p) { [ p[0],  p[1],  p[2]] },
+    -> (p) { [ p[1],  p[2],  p[0]] },
+    -> (p) { [ p[2],  p[0],  p[1]] },
+    -> (p) { [-p[0],  p[2],  p[1]] },
+    -> (p) { [ p[2],  p[1], -p[0]] },
+    -> (p) { [ p[1], -p[0],  p[2]] },
+    -> (p) { [ p[0],  p[2], -p[1]] },
+    -> (p) { [ p[2], -p[1],  p[0]] },
+    -> (p) { [-p[1],  p[0],  p[2]] },
+    -> (p) { [ p[0], -p[2],  p[1]] },
+    -> (p) { [-p[2],  p[1],  p[0]] },
+    -> (p) { [ p[1],  p[0], -p[2]] },
+    -> (p) { [-p[0], -p[1],  p[2]] },
+    -> (p) { [-p[1],  p[2], -p[0]] },
+    -> (p) { [ p[2], -p[0], -p[1]] },
+    -> (p) { [-p[0],  p[1], -p[2]] },
+    -> (p) { [ p[1], -p[2], -p[0]] },
+    -> (p) { [-p[2], -p[0],  p[1]] },
+    -> (p) { [ p[0], -p[1], -p[2]] },
+    -> (p) { [-p[1], -p[2],  p[0]] },
+    -> (p) { [-p[2],  p[0], -p[1]] },
+    -> (p) { [-p[0], -p[2], -p[1]] },
+    -> (p) { [-p[2], -p[1], -p[0]] },
+    -> (p) { [-p[1], -p[0], -p[2]] },
+  ].freeze
+
   def initialize(number, points)
     @number = number
     @points = points
-    @origin = [0, 0] if number == 0
+    @origin = [0, 0, 0] if number == 0
   end
 
   attr_accessor :number, :points, :origin
@@ -13,91 +46,32 @@ class Scanner
     "<Scanner ##{@number}: origin -> #{origin || 'UNKNOWN'}, size -> #{beacon_count} >"
   end
 
-  def log
-    File.open('log.txt', 'w') do |f|
-      points.sort.each do |point|
-        f.write point
-        f.write("\n")
-      end
-    end
-  end
-
-  def beacon_count
-    points.size
-  end
-
   def target_rotation(world)
-    world.points.each do |p_ref|
-      rotations.map do |rotation|
-        offset = p_ref.zip(rotation.first).map { |pair| pair.reduce(:-) }
-        
-        absolute_points = rotation.map do |p_rel|
-          offset.zip(p_rel).map(&:sum)
-        end
-  
-        if absolute_points.count { |p_abs| world.points.include?(p_abs) } >= 12
-          @origin = offset
+    rotations.each do |rotation|
+      translation, count = rotation.product(world.points).map { |p_rot, p_ref| relative_position(p_ref, p_rot) }.tally.max_by { |translation, count| count }
 
-          return absolute_points
-        end
-      end
+      @origin = translation
+
+      return rotation.map { |p_rot| add_points(p_rot, translation) } if count >= 12
     end
 
     nil
   end
 
   def rotations
-    return @rotations if @rotations
-
-    @rotations = Array.new(24) { [] }
-
-    points.each do |x, y, z|
-      # Face forward
-      @rotations[ 0] << [ x,  y,  z]
-      @rotations[ 1] << [-y,  x,  z]
-      @rotations[ 2] << [-x, -y,  z]
-      @rotations[ 3] << [ y, -x,  z]
-      
-      # Face left
-      @rotations[ 4] << [ z,  y, -x]
-      @rotations[ 5] << [ z,  x,  y]
-      @rotations[ 6] << [ z, -y,  x]
-      @rotations[ 7] << [ z, -x, -y]
-      
-      # Face back
-      @rotations[ 8] << [-x,  y, -z]
-      @rotations[ 9] << [-y, -x, -z]
-      @rotations[10] << [ x, -y, -z]
-      @rotations[11] << [ y,  x, -z]
-
-      # Face right
-      @rotations[12] << [-z,  y,  x]
-      @rotations[13] << [-z,  x, -y]
-      @rotations[14] << [-z, -y, -x]
-      @rotations[15] << [-z, -x,  y]
-      
-      # Face up
-      @rotations[16] << [ x,  z, -y]
-      @rotations[17] << [-y,  z, -x]
-      @rotations[18] << [-x,  z,  y]
-      @rotations[19] << [ y,  z,  x]
-
-      # Face down
-      @rotations[20] << [ x, -z,  y]
-      @rotations[21] << [ y, -z, -x]
-      @rotations[22] << [-x, -z, -y]
-      @rotations[23] << [-y, -z,  x]
+    @rotations ||= ROTATIONS.map do |rotation_function|
+      points.map do |point|
+        rotation_function.call(point)
+      end
     end
-
-    @rotations
   end
 
-  def signature
-    @signature ||= points.permutation(2).map do |pair|
-      pair.first.zip(pair.last).map do |coordinate|
-        coordinate.reduce(:-).abs
-      end
-    end.uniq
+  def add_points(p1, p2)
+    p1.zip(p2).map(&:sum)
+  end
+
+  def relative_position(p1, p2)
+    p1.zip(p2).map { |pair| pair.reduce(:-) }
   end
 end
 
@@ -109,12 +83,11 @@ def part_1_solution(groups)
   end
 
   world = scanners.shift
-  found_scanners = []
+  found_scanners = [world]
 
   until scanners.empty?
     target_scanner = scanners.detect do |target_scanner|
       absolute_points = target_scanner.target_rotation(world)
-
       next unless absolute_points
 
       world.points = [*world.points, *absolute_points].uniq
@@ -128,14 +101,24 @@ def part_1_solution(groups)
     scanners.select! { |scanner| scanner != target_scanner }
   end
 
-  puts "PART 1: #{world.beacon_count}"
+  puts "PART 1: #{world.points.size}"
+
+  found_scanners
 end
 
-def part_2_solution(values)
-  value = 0
+def part_2_solution(scanners)
+  distances = []
 
-  puts "PART 2: #{value}"
+  scanners.each_with_index do |scanner1, i|
+    scanners.each_with_index do |scanner2, j|
+      next if i == j
+
+      distances << scanner1.origin.zip(scanner2.origin).map { |pair| pair.reduce(:-).abs }.sum
+    end
+  end
+ 
+  puts "PART 2: #{distances.max}"
 end
 
-part_1_solution str_groups_from_prompt
-part_2_solution []
+scanners = part_1_solution str_groups_from_prompt
+part_2_solution scanners
